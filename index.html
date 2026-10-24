@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TDEE & Calorie Deficit App</title>
+
+    <!-- นำเข้าฟอนต์ Prompt และ ไอคอน Boxicons -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!-- นำเข้าไฟล์ CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ปุ่มสลับ Dark / Light Mode -->
+    <button id="theme-toggle" class="theme-toggle" title="สลับโหมดหน้าจอ">🌙</button>
+
+    <div class="app-container">
+
+        <!-- ส่วนที่ 1: ฟอร์มรับข้อมูล -->
+        <div class="card">
+            <h2><i class='bx bx-user-circle'></i> ข้อมูลส่วนตัว</h2>
+
+            <form id="tdee-form">
+                <div class="form-group">
+                    <label><i class='bx bx-user'></i> เพศ:</label>
+                    <select id="gender" required>
+                        <option value="male">ชาย</option>
+                        <option value="female">หญิง</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class='bx bx-calendar-event'></i> อายุ (ปี):</label>
+                        <input type="number" id="age" min="15" max="80" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class='bx bx-dumbbell'></i> น้ำหนัก (กก.):</label>
+                        <input type="number" id="weight" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class='bx bx-ruler'></i> ส่วนสูง (ซม.):</label>
+                        <input type="number" id="height" step="0.1" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class='bx bx-run'></i> กิจกรรมประจำวัน:</label>
+                    <select id="activity" required>
+                        <option value="1.2">นั่งทำงานเป็นหลัก ไม่ออกกำลังกาย</option>
+                        <option value="1.375">ออกกำลังกายเบาๆ (1-3 วัน/สัปดาห์)</option>
+                        <option value="1.55">ออกกำลังกายปานกลาง (3-5 วัน/สัปดาห์)</option>
+                        <option value="1.725">ออกกำลังกายหนัก (6-7 วัน/สัปดาห์)</option>
+                        <option value="1.9">ออกกำลังกายหนักมาก / ใช้แรงงาน</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submit-btn"><i class='bx bx-calculator'></i> คำนวณ TDEE</button>
+            </form>
+        </div>
+
+        <!-- ส่วนที่ 2: ผลการคำนวณ -->
+        <div id="results" class="card results-section">
+
+            <!-- ม่านเบลอ (จะหายไปเมื่อกดคำนวณ) -->
+            <div id="waiting-mask" class="waiting-mask">
+                <i class='bx bx-lock-alt'></i>
+                <p>กรุณากรอกข้อมูลและกดคำนวณ</p>
+            </div>
+
+            <h2><i class='bx bx-bar-chart-alt-2'></i> ผลการคำนวณ</h2>
+
+            <div class="result-box primary-box">
+                <div class="result-row">
+                    <span>BMR (พลังงานพื้นฐาน)</span>
+                    <strong><span id="bmr-result">0</span> <small>kcal</small></strong>
+                </div>
+                <div class="result-row highlight">
+                    <span>TDEE (พลังงานที่ใช้ทั้งหมด)</span>
+                    <strong><span id="tdee-result">0</span> <small>kcal</small></strong>
+                </div>
+            </div>
+
+            <h3><i class='bx bx-target-lock'></i> เป้าหมายลดน้ำหนัก</h3>
+            <div class="result-box">
+                <div class="result-row">
+                    <span>แบบค่อยเป็นค่อยไป (-500)</span>
+                    <strong class="text-green"><span id="deficit-mild">0</span> <small>kcal/วัน</small></strong>
+                </div>
+                <div class="result-row">
+                    <span>แบบเร่งด่วน (-750)</span>
+                    <strong class="text-orange"><span id="deficit-extreme">0</span> <small>kcal/วัน</small></strong>
+                </div>
+            </div>
+
+            <h3><i class='bx bx-pie-chart-alt-2'></i> สัดส่วนสารอาหารต่อวัน</h3>
+            <div class="macro-box">
+                <div class="macro-item protein">
+                    <span class="macro-label">โปรตีน</span>
+                    <span class="macro-value"><span id="macro-protein">0</span><small>g</small></span>
+                </div>
+                <div class="macro-item fat">
+                    <span class="macro-label">ไขมัน</span>
+                    <span class="macro-value"><span id="macro-fat">0</span><small>g</small></span>
+                </div>
+                <div class="macro-item carbs">
+                    <span class="macro-label">คาร์บ</span>
+                    <span class="macro-value"><span id="macro-carbs">0</span><small>g</small></span>
+                </div>
+            </div>
+
+            <div class="result-footer">
+                <i class='bx bx-info-circle'></i> สัดส่วนสารอาหารอ้างอิงจากเป้าหมายแบบค่อยเป็นค่อยไป
+            </div>
+        </div>
+
+    </div>
+
+    <!-- นำเข้าไฟล์ JavaScript -->
+    <script src="script.js"></script>
+</body>
+
+</html>
